@@ -148,7 +148,7 @@ export default function Home() {
 
   return (
 
-    <main className="relative p-5 gap-5 w-screen h-screen bg-slate-100 flex flex-col justify-center items-center">
+    <main className="relative p-5 gap-5 w-full h-full bg-slate-100 flex flex-col justify-center items-center">
 
       <section onClick={()=> buscaConvidados()} className="w-full h-fit flex gap-3 rounded-xl">
 
@@ -204,7 +204,7 @@ export default function Home() {
       </section>
 
       {/* modal adiciona convidado */}
-      <Modal close={()=> fechaModalAdiciona()} open={modalAdiciona} className="p-3">
+      <Modal close={()=> fechaModalAdiciona()} open={modalAdiciona} className="">
 
         <div className="flex flex-col bg-white w-screen h-screen">
 

@@ -19,7 +19,7 @@ export default function RootLayout({
       {/* <Head>
         <title>My page title</title>
       </Head> */}
-      <body className="bg-white w-screen h-screen">
+      <body className="bg-slate-100 w-screen h-screen py-8">
         {children}
         <div id="portal"></div>
       </body>
