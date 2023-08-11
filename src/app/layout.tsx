@@ -16,7 +16,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      {/* <Head>
+        <title>My page title</title>
+      </Head> */}
+      <body className="bg-white w-screen h-screen">
+        {children}
+        <div id="portal"></div>
+      </body>
     </html>
-  )
+  );
 }
