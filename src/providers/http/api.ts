@@ -38,13 +38,14 @@ function fetchApi() {
         
         delete: async (url: string, object?: any): Promise<JSON | any> => {
                 
-            const response = await fetch(url + `${ object ? `?${new URLSearchParams(object)}` : ''}`, {
+            const response = await fetch(url, {
                 method: 'DELETE',
                 mode: 'cors',
                 headers: {
                     'Content-Type': 'application/json;charset=utf-8',
                     // 'Authorization': `Bearer ${await Cookie.get('auth')}`,
                 },
+                body: JSON.stringify(object)
             })
             return response.status === 204 ? response : response.json()
         },

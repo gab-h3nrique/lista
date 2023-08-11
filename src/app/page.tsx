@@ -116,8 +116,48 @@ export default function Home() {
 
   }
 
-  function salvaEdicao() {
+  async function salvaEdicao() {
 
+    // caso input seja vazio
+    if(!editaConvidado.nome) return console.log('nome não pode ser vazio');
+
+    abreModalCarregando();
+
+    setTimeout(fechaModalAdiciona, 1000)
+
+    const response = await Api.post('/api/convidado', convidado)
+
+    if(!response.convidado) return alert('ocorreu um erro')
+
+    const novalista = lista.map((object)=> object.id === editaConvidado.id ? response.convidado : object)
+
+    setLista(novalista)
+
+    setEditaConvidado(convidadoLimpo)
+
+    setTimeout(fechaModalCarregando, 2500)
+
+    fechaModalEdita()
+
+  }
+
+  async function removeConvidado() {
+
+    abreModalCarregando();
+
+    setTimeout(fechaModalEdita, 1000)
+
+    const response = await Api.delete('/api/convidado', { id: editaConvidado.id })
+
+    if(!response.convidado) return alert('ocorreu um erro')
+
+    const novalista = lista.filter((object)=> object.id !== editaConvidado.id)
+
+    setLista(novalista)
+
+    setEditaConvidado(convidadoLimpo)
+
+    setTimeout(fechaModalCarregando, 2500)
 
     fechaModalEdita()
 
@@ -164,9 +204,9 @@ export default function Home() {
 
       {
         // array de lista na tela
-        lista.map(({nome, convidadoPor, grupo, confirmouPresenca, cor}, i)=>( 
+        lista.map(({id, nome, convidadoPor, grupo, confirmouPresenca, cor}, i)=>( 
 
-          <div onClick={()=> {setEditaConvidado({ nome, convidadoPor, grupo, confirmouPresenca, cor }); abreModalEdita()}} key={i} className={`px-3 py-2 gap-2 rounded-xl flex items-center justify-start hover:scale-x-[.97] cursor-pointer text-white duration-150 opacity-80 focus:opacity-100 hover:opacity-100 ${ i%2 == 0 ? 'bg-slate-50' : 'bg-slate-200'}`}>
+          <div onClick={()=> {setEditaConvidado({ id, nome, convidadoPor, grupo, confirmouPresenca, cor }); abreModalEdita()}} key={i} className={`px-3 py-2 gap-2 rounded-xl flex items-center justify-start hover:scale-x-[.97] cursor-pointer text-white duration-150 opacity-80 focus:opacity-100 hover:opacity-100 ${ i%2 == 0 ? 'bg-slate-50' : 'bg-slate-200'}`}>
             
             <svg className={`fill-blue-500 h-5 ${ confirmouPresenca ? 'hidden ' : 'block' }`} viewBox="0 0 512 512"><path d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L369 209z"/></svg>
             <svg className={`fill-blue-500 h-5 ${ confirmouPresenca ? 'block ' : 'hidden' }`} viewBox="0 0 512 512"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/></svg>
@@ -231,12 +271,19 @@ export default function Home() {
 
               <input type="text" onKeyUp={({key}) => key === 'Enter' && proximaEtapa() } onChange={(e)=> setConvidado({ ...convidado, convidadoPor: e.target.value }) } value={convidado.convidadoPor} className={`w-full bg-gray-50 p-4 text-slate-500 text-center font-bold text-base rounded-xl outline-0 duration-150 ${ etapa === 2 ? 'block': 'hidden' }`} placeholder="Quem convidou . . ."/>
                 
-              <div onClick={()=> setConvidado({ ...convidado, confirmouPresenca: !convidado.confirmouPresenca })} className={`p-3 gap-3 border-2 rounded-full w-full justify-start items-center cursor-pointer group duration-150 ${ convidado.confirmouPresenca ? 'border-blue-500 bg-blue-500' : 'border-slate-500 bg-slate-100' } ${ etapa === 4 ? 'flex' : 'hidden' }`}>
+              {/* <div onClick={()=> setConvidado({ ...convidado, confirmouPresenca: !convidado.confirmouPresenca })} className={`p-3 gap-3 border-2 rounded-full w-full justify-start items-center cursor-pointer group duration-150 ${ convidado.confirmouPresenca ? 'border-blue-500 bg-blue-500' : 'border-slate-500 bg-slate-100' } ${ etapa === 4 ? 'flex' : 'hidden' }`}>
                   
                 <svg className={`fill-slate-500 duration-150 ${ convidado.confirmouPresenca ? 'hidden h-7' : 'block h-5' }`} viewBox="0 0 512 512"><path d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L369 209z"/></svg>
                 <svg className={`fill-white duration-150 ${ convidado.confirmouPresenca ? 'block h-7' : 'hidden h-5' }`} viewBox="0 0 512 512"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/></svg>
 
                 <p className={`text-slate-500 font-semibold duration-150 w-fit h-fit ${ convidado.confirmouPresenca ? 'text-white text-2xl' : 'text-slate-500 text-xl' } `}>Sim</p>
+
+              </div> */}
+
+              <div className={`grid grid-cols-2 gap-5 w-full ${ etapa === 4 ? 'flex' : 'hidden' }`}>
+
+                <button onClick={()=> setConvidado({ ...convidado, confirmouPresenca: true })} className={`col-span-1 w-full h-14 bg-slate-400 rounded-2xl ${ convidado.confirmouPresenca ? 'scale-110 bg-blue-400' : 'scale-100 bg-slate-400' } duration-150 text-white font-bold`}>Sim</button>
+                <button onClick={()=> setConvidado({ ...convidado, confirmouPresenca: false })} className={`col-span-1 w-full h-14 bg-slate-400 rounded-2xl ${ !convidado.confirmouPresenca ? 'scale-110 bg-blue-400' : 'scale-100 bg-slate-400' } duration-150 text-white font-bold`}>Não</button>
 
               </div>
 
@@ -316,7 +363,7 @@ export default function Home() {
         <div className="flex flex-col bg-white w-screen h-screen">
 
           {/* header */}
-          <section className="p-3 flex justify-between items-center w-full h-16">
+          <section onClick={()=> console.log(editaConvidado)} className="p-3 flex justify-between items-center w-full h-16">
 
             <p className="text-xl text-blue-500 font-bold">Editar convidado</p>
 
@@ -328,9 +375,32 @@ export default function Home() {
           {/* header */}
 
           {/* content */}
-          <section onClick={()=> console.log(editaConvidado)} className="p-6 gap-5 bg-slate-200 w-full h-full flex flex-col justify-center items-center">
+          <section className="p-6 gap-3 bg-slate-200 w-full h-full flex flex-col justify-center items-center">
 
 
+            <p className="w-full text-slate-400 font-bold">Nome</p>
+            <input type="text" onKeyUp={({key}) => key === 'Enter' && proximaEtapa() } onChange={(e)=> setEditaConvidado({ ...editaConvidado, nome: e.target.value }) } value={editaConvidado.nome} className={`w-full bg-gray-50 p-4 text-slate-500 text-center font-bold text-base rounded-xl outline-0 duration-150 block`} placeholder="Digite o nome . . ."/>
+            
+            <p className="w-full text-slate-400 font-bold">Quem convidou</p>
+            <input type="text" onKeyUp={({key}) => key === 'Enter' && proximaEtapa() } onChange={(e)=> setEditaConvidado({ ...editaConvidado, convidadoPor: e.target.value }) } value={editaConvidado.convidadoPor} className={`w-full bg-gray-50 p-4 text-slate-500 text-center font-bold text-base rounded-xl outline-0 duration-150 block`} placeholder="Convidado por . . ."/>
+            
+            <p className="w-full text-slate-400 font-bold">Grupo</p>
+            <div className={`grid grid-cols-2 gap-5 w-full`}>
+
+              <button onClick={()=> setEditaConvidado({ ...editaConvidado, cor: 1, grupo: 'familia' })} className={`col-span-1 w-full h-28 bg-fuchsia-400 ${ editaConvidado.grupo == 'familia' ? 'scale-110 opacity-100' : 'scale-100 opacity-50'} rounded-2xl duration-150 text-white font-bold`}>Familia</button>
+              <button onClick={()=> setEditaConvidado({ ...editaConvidado, cor: 2, grupo: 'padrinhos' })} className={`col-span-1 w-full h-28 bg-violet-400 ${ editaConvidado.grupo == 'padrinhos' ? 'scale-110 opacity-100' : 'scale-100 opacity-50'} rounded-2xl duration-150 text-white font-bold`}>Padrinhos</button>
+              <button onClick={()=> setEditaConvidado({ ...editaConvidado, cor: 3, grupo: 'amigos' })} className={`col-span-1 w-full h-28 bg-emerald-400 ${ editaConvidado.grupo == 'amigos' ? 'scale-110 opacity-100' : 'scale-100 opacity-50'} rounded-2xl duration-150 text-white font-bold`}>Amigos</button>
+              <button onClick={()=> setEditaConvidado({ ...editaConvidado, cor: 4, grupo: 'conhecidos' })} className={`col-span-1 w-full h-28 bg-cyan-400 ${ editaConvidado.grupo == 'conhecidos' ? 'scale-110 opacity-100' : 'scale-100 opacity-50'} rounded-2xl duration-150 text-white font-bold`}>Conhecidos</button>
+
+            </div>
+
+            <p className="w-full text-slate-400 font-bold">Confirmou presença</p>
+            <div className={`flex gap-5 w-full`}>
+
+              <button onClick={()=> setEditaConvidado({ ...editaConvidado, confirmouPresenca: true })} className={`col-span-1 w-full h-14 bg-slate-400 rounded-2xl ${ editaConvidado.confirmouPresenca ? 'scale-110 bg-blue-400' : 'scale-100 bg-slate-400' } duration-150 text-white font-bold`}>Sim</button>
+              <button onClick={()=> setEditaConvidado({ ...editaConvidado, confirmouPresenca: false })} className={`col-span-1 w-full h-14 bg-slate-400 rounded-2xl ${ !editaConvidado.confirmouPresenca ? 'scale-110 bg-blue-400' : 'scale-100 bg-slate-400' } duration-150 text-white font-bold`}>Não</button>
+
+            </div>
 
           </section>
           {/* content */}
@@ -338,7 +408,12 @@ export default function Home() {
           {/* footer */}
           <section className="gap-3 p-3 flex bg-white center-between items-center w-full h-16 text-white">
 
-            <button onClick={salvaEdicao} className={`p-2 gap-2 w-full flex font-bold rounded-xl bg-blue-500 justify-center items-center duration-150 ${convidado.convidadoPor ? 'opacity-100' : 'opacity-40'}`}>
+            <button onClick={removeConvidado} className={`p-2 gap-2 w-full flex font-bold rounded-xl bg-red-400 justify-center items-center duration-150`}>
+              {/* <svg className="fill-white h-5" viewBox="0 0 448 512"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg> */}
+              remover
+            </button>
+
+            <button onClick={salvaEdicao} className={`p-2 gap-2 w-full flex font-bold rounded-xl bg-blue-500 justify-center items-center duration-150 ${ convidado.convidadoPor && editaConvidado.nome ? 'opacity-100' : 'opacity-40'}`}>
               {/* <svg className="fill-white h-5" viewBox="0 0 448 512"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg> */}
               salvar
             </button>

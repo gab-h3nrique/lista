@@ -27,7 +27,7 @@ export async function GET(req: Request) {
 
     try {
 
-        return new Response( JSON.stringify( { convidados: await prisma.convidados.findMany() } ) , { status: 200 });
+        return new Response( JSON.stringify({ convidados: await prisma.convidados.findMany({ orderBy: {id:'desc'} }) }) , { status: 200 });
 
     } catch (err) { console.log(err); return new Response( JSON.stringify( err ) , { status: 500 }); }
 
@@ -37,13 +37,34 @@ export async function POST(request: Request) {
 
     try {
 
+
+
         const convidado = await request.json()
 
-        const convidadoDb = await prisma.convidados.create({ data: convidado })
 
-        return new Response( JSON.stringify( {convidado: convidadoDb} ) , { status: 201 });
+        // if(convidado.id) convidadoDb = await prisma.convidados.up({ data: convidado })
+
+        // const convidadoDb = await prisma.convidados.upsert( { where: { id: convidado.id} update: convidado, data: convidado})
+
+        // const convidadoDb = await prisma.convidados.create({ data: convidado })
+
+        // return new Response( JSON.stringify( {convidado: convidadoDb} ) , { status: 201 });
 
 
+
+    } catch (err) { console.log(err); return new Response( JSON.stringify( err ) , { status: 500 }); }
+
+}
+
+export async function DELETE(request: Request) {
+
+    try {
+
+        const { id } = await request.json()
+
+        const convidadoDb = await prisma.convidados.delete({ where: { id: Number(id) } })
+
+        return new Response( JSON.stringify( {convidado: convidadoDb} ) , { status: 200 });
 
     } catch (err) { console.log(err); return new Response( JSON.stringify( err ) , { status: 500 }); }
 
