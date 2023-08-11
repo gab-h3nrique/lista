@@ -25,20 +25,26 @@ import prisma from "../../../db/prisma"
 
 export async function GET(req: Request) {
 
+    try {
 
+        return new Response( JSON.stringify( { convidados: await prisma.convidados.findMany() } ) , { status: 200 });
 
-    return new Response( JSON.stringify( { convidados: await prisma.convidados.findMany() } ) , { status: 200 });
-
-    
+    } catch (err) { console.log(err); return new Response( JSON.stringify( err ) , { status: 500 }); }
 
 }
 
 export async function POST(request: Request) {
 
-    const convidado = await request.json()
+    try {
 
-    const convidadoDb = await prisma.convidados.create({ data: convidado })
+        const convidado = await request.json()
 
-    return new Response( JSON.stringify( {convidado: convidadoDb} ) , { status: 201 });
+        const convidadoDb = await prisma.convidados.create({ data: convidado })
+
+        return new Response( JSON.stringify( {convidado: convidadoDb} ) , { status: 201 });
+
+
+
+    } catch (err) { console.log(err); return new Response( JSON.stringify( err ) , { status: 500 }); }
 
 }

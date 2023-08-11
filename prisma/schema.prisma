@@ -22,7 +22,6 @@ datasource db {
 model Convidados {
 
   id                Int @id @default(autoincrement())
-
   nome              String 
   convidadoPor      String?
   grupo             String?
