@@ -37,20 +37,11 @@ export async function POST(request: Request) {
 
     try {
 
+        const convidado = await request.json();
 
+        const convidadoDb = await prisma.convidados.upsert( {  where: { id: convidado.id ? convidado.id : -1 }, update: convidado, create: convidado})
 
-        const convidado = await request.json()
-
-
-        // if(convidado.id) convidadoDb = await prisma.convidados.up({ data: convidado })
-
-        // const convidadoDb = await prisma.convidados.upsert( { where: { id: convidado.id} update: convidado, data: convidado})
-
-        // const convidadoDb = await prisma.convidados.create({ data: convidado })
-
-        // return new Response( JSON.stringify( {convidado: convidadoDb} ) , { status: 201 });
-
-
+        return new Response( JSON.stringify( {convidado: convidadoDb} ) , { status: 201 });
 
     } catch (err) { console.log(err); return new Response( JSON.stringify( err ) , { status: 500 }); }
 
